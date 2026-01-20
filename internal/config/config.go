@@ -6,7 +6,7 @@ import (
 	"time"
 )
 
-type Config struct {
+type RedisConfig struct {
 	Addr         string
 	Username     string
 	Password     string
@@ -18,8 +18,14 @@ type Config struct {
 	WeatherTTL   time.Duration
 }
 
-func NewConfig() *Config {
-	return &Config{
+type KafkaConfig struct {
+	Brokers []string
+	Topic   string
+	GroupID string
+}
+
+func NewRedisConfig() *RedisConfig {
+	return &RedisConfig{
 		Addr:         getEnv("REDIS_ADDR", "127.0.0.1:6379"),
 		Username:     getEnv("REDIS_USERNAME", ""),
 		Password:     getEnv("REDIS_PASSWORD", ""),
@@ -28,7 +34,41 @@ func NewConfig() *Config {
 		DialTimeout:  getEnvDuration("REDIS_DIAL_TIMEOUT", 5*time.Second),
 		ReadTimeout:  getEnvDuration("REDIS_READ_TIMEOUT", 5*time.Second),
 		WriteTimeout: getEnvDuration("REDIS_WRITE_TIMEOUT", 5*time.Second),
-		WeatherTTL:   getEnvDuration("REDIS_WEATHER_TTL", 30*time.Second),
+		WeatherTTL:   getEnvDuration("REDIS_WEATHER_TTL", 3000*time.Second),
+	}
+}
+
+func NewKafkaConfig() *KafkaConfig {
+	return &KafkaConfig{
+		Brokers: []string{getEnv("KAFKA_BROKERS", "localhost:9091")},
+		Topic:   getEnv("KAFKA_TOPIC", "external.events"),
+		GroupID: getEnv("KAFKA_GROUP_ID", "aggregator"),
+	}
+}
+
+type PostgresConfig struct {
+	Host            string
+	Port            int
+	DBName          string
+	User            string
+	Password        string
+	SSLMode         string
+	MaxOpenConns    int
+	MaxIdleConns    int
+	ConnMaxLifetime time.Duration
+}
+
+func NewPostgresConfig() *PostgresConfig {
+	return &PostgresConfig{
+		Host:            getEnv("POSTGRES_HOST", "localhost"),
+		Port:            getEnvInt("POSTGRES_PORT", 5432),
+		DBName:          getEnv("POSTGRES_DB", "service_info"),
+		User:            getEnv("POSTGRES_USER", "postgres"),
+		Password:        getEnv("POSTGRES_PASSWORD", "postgres"),
+		SSLMode:         getEnv("POSTGRES_SSLMODE", "disable"),
+		MaxOpenConns:    getEnvInt("POSTGRES_MAX_OPEN_CONNS", 10),
+		MaxIdleConns:    getEnvInt("POSTGRES_MAX_IDLE_CONNS", 5),
+		ConnMaxLifetime: getEnvDuration("POSTGRES_CONN_MAX_LIFETIME", 5*time.Minute),
 	}
 }
 

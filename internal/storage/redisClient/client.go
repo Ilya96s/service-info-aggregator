@@ -1,4 +1,4 @@
-package rediss
+package redisClient
 
 import (
 	"context"
@@ -9,7 +9,7 @@ import (
 	"github.com/service-info-aggregator/internal/config"
 )
 
-func NewRedisClient(ctx context.Context, cfg *config.Config) (*redis.Client, error) {
+func NewRedisClient(ctx context.Context, cfg *config.RedisConfig) (*redis.Client, error) {
 	client := redis.NewClient(&redis.Options{
 		Addr:         cfg.Addr,
 		Password:     cfg.Password,
