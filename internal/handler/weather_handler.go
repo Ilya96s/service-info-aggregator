@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"encoding/json"
@@ -6,23 +6,23 @@ import (
 	"time"
 
 	"github.com/service-info-aggregator/internal/repository/cache"
-	"github.com/service-info-aggregator/internal/services"
+	"github.com/service-info-aggregator/internal/service"
 )
 
 type WeatherHandler struct {
-	service  *services.AggregationService
-	provider *services.WeatherProvider
-	cache    *cache.RedisRepository
-	ttl      time.Duration
+	aggregationService *service.AggregationService
+	weatherProvider    *service.WeatherProvider
+	cache              *cache.RedisRepository
+	ttl                time.Duration
 }
 
-func NewWeatherHandler(service *services.AggregationService, provider *services.WeatherProvider,
+func NewWeatherHandler(aggregationService *service.AggregationService, weatherProvider *service.WeatherProvider,
 	repo *cache.RedisRepository, ttl time.Duration) *WeatherHandler {
 	return &WeatherHandler{
-		service:  service,
-		provider: provider,
-		cache:    repo,
-		ttl:      ttl,
+		aggregationService: aggregationService,
+		weatherProvider:    weatherProvider,
+		cache:              repo,
+		ttl:                ttl,
 	}
 }
 
@@ -43,14 +43,14 @@ func (h *WeatherHandler) handleGet(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	key := h.provider.CacheKey(city)
+	key := h.weatherProvider.CacheKey(city)
 
 	if cached, err := h.cache.Get(ctx, key); err == nil {
 		responseWithJSON(w, http.StatusOK, cached)
 		return
 	}
 
-	data, err := h.service.Execute(ctx, h.provider, city)
+	data, err := h.aggregationService.Execute(ctx, h.weatherProvider, city)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return

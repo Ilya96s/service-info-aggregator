@@ -1,4 +1,4 @@
-package handlers
+package handler
 
 import (
 	"encoding/json"
@@ -6,15 +6,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/service-info-aggregator/internal/models/dto"
-	"github.com/service-info-aggregator/internal/services"
+	"github.com/service-info-aggregator/internal/model/dto"
+	"github.com/service-info-aggregator/internal/service"
 )
 
 type PopularDataHandler struct {
-	service *services.PopularDataService
+	service *service.PopularDataService
 }
 
-func NewPopularDataHandler(service *services.PopularDataService) *PopularDataHandler {
+func NewPopularDataHandler(service *service.PopularDataService) *PopularDataHandler {
 	return &PopularDataHandler{
 		service: service,
 	}

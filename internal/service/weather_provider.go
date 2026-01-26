@@ -1,9 +1,9 @@
-package services
+package service
 
 import (
 	"context"
 
-	"github.com/service-info-aggregator/internal/models/dto"
+	"github.com/service-info-aggregator/internal/model/dto"
 )
 
 type WeatherProvider struct {

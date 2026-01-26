@@ -10,12 +10,13 @@ import (
 
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
+	"github.com/service-info-aggregator/internal/background"
 	"github.com/service-info-aggregator/internal/config"
-	"github.com/service-info-aggregator/internal/handlers"
+	"github.com/service-info-aggregator/internal/handler"
 	"github.com/service-info-aggregator/internal/messaging/kafka"
 	"github.com/service-info-aggregator/internal/repository/cache"
 	postgresRepo "github.com/service-info-aggregator/internal/repository/postgres"
-	"github.com/service-info-aggregator/internal/services"
+	"github.com/service-info-aggregator/internal/service"
 	"github.com/service-info-aggregator/internal/storage/postgres"
 )
 
@@ -63,19 +64,19 @@ func main() {
 	popularDataRepository := postgresRepo.NewPopularDataRepository(db)
 
 	// --- Popular Data Service
-	popularDataService := services.NewPopularDataService(popularDataRepository)
+	popularDataService := service.NewPopularDataService(popularDataRepository)
 
 	// --- Сервис агрегирования ---
-	aggService := services.NewAggregationService(producer, kafkaCfg.Topic)
+	aggService := service.NewAggregationService(producer, kafkaCfg.Topic)
 
 	// --- Popular Data Handler ---
-	popularDataHandler := handlers.NewPopularDataHandler(popularDataService)
+	popularDataHandler := handler.NewPopularDataHandler(popularDataService)
 
 	// --- Weather Provider ---
-	weatherProvider := &services.WeatherProvider{}
+	weatherProvider := &service.WeatherProvider{}
 
 	// --- Weather Handler (HTTP) ---
-	weatherHandler := handlers.NewWeatherHandler(aggService, weatherProvider, repo, redisCfg.WeatherTTL)
+	weatherHandler := handler.NewWeatherHandler(aggService, weatherProvider, repo, redisCfg.WeatherTTL)
 
 	mux := http.NewServeMux()
 
@@ -98,6 +99,13 @@ func main() {
 		return
 	}
 	defer consumer.Close()
+
+	// --- Scheduler ---
+	scheduler := background.NewPriorityScheduler(popularDataService, aggService, 30*time.Second)
+
+	go func() {
+		scheduler.Start(ctx)
+	}()
 
 	// --- Запуск Kafka Consumer в отдельной горутине ---
 	go func() {

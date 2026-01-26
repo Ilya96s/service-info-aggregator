@@ -18,12 +18,6 @@ type RedisConfig struct {
 	WeatherTTL   time.Duration
 }
 
-type KafkaConfig struct {
-	Brokers []string
-	Topic   string
-	GroupID string
-}
-
 func NewRedisConfig() *RedisConfig {
 	return &RedisConfig{
 		Addr:         getEnv("REDIS_ADDR", "127.0.0.1:6379"),
@@ -38,10 +32,16 @@ func NewRedisConfig() *RedisConfig {
 	}
 }
 
+type KafkaConfig struct {
+	Brokers []string
+	Topic   string
+	GroupID string
+}
+
 func NewKafkaConfig() *KafkaConfig {
 	return &KafkaConfig{
 		Brokers: []string{getEnv("KAFKA_BROKERS", "localhost:9091")},
-		Topic:   getEnv("KAFKA_TOPIC", "external.events"),
+		Topic:   getEnv("KAFKA_TOPIC", "external.events.response"),
 		GroupID: getEnv("KAFKA_GROUP_ID", "aggregator"),
 	}
 }
