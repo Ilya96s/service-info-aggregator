@@ -7,15 +7,15 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/service-info-aggregator/internal/repository/cache"
+	"service-info-aggregator/internal/repository/aggregation_data"
 )
 
 type WeatherEventHandler struct {
-	cache *cache.RedisRepository
+	cache *aggregation_data.RedisRepository
 	ttl   time.Duration
 }
 
-func NewWeatherEventHandler(c *cache.RedisRepository, ttl time.Duration) *WeatherEventHandler {
+func NewWeatherEventHandler(c *aggregation_data.RedisRepository, ttl time.Duration) *WeatherEventHandler {
 	return &WeatherEventHandler{
 		cache: c,
 		ttl:   ttl,

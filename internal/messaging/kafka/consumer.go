@@ -7,8 +7,9 @@ import (
 	"strings"
 	"time"
 
+	"service-info-aggregator/internal/model/events"
+
 	"github.com/confluentinc/confluent-kafka-go/v2/kafka"
-	"github.com/service-info-aggregator/internal/model/events"
 )
 
 type KafkaConsumer struct {

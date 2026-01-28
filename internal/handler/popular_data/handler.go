@@ -1,4 +1,4 @@
-package handler
+package popular_data
 
 import (
 	"encoding/json"
@@ -6,15 +6,15 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/service-info-aggregator/internal/model/dto"
-	"github.com/service-info-aggregator/internal/service"
+	"service-info-aggregator/internal/model/dto"
+	"service-info-aggregator/internal/service/popular_data"
 )
 
 type PopularDataHandler struct {
-	service *service.PopularDataService
+	service *popular_data.PopularDataService
 }
 
-func NewPopularDataHandler(service *service.PopularDataService) *PopularDataHandler {
+func NewPopularDataHandler(service *popular_data.PopularDataService) *PopularDataHandler {
 	return &PopularDataHandler{
 		service: service,
 	}
@@ -120,4 +120,14 @@ func extractID(path string) (int, error) {
 	}
 
 	return strconv.Atoi(parts[1])
+}
+
+func responseWithJSON(w http.ResponseWriter, status int, payload any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	json.NewEncoder(w).Encode(payload)
+}
+
+func responseWithError(w http.ResponseWriter, statusCode int, message string) {
+	responseWithJSON(w, statusCode, map[string]string{"error": message})
 }

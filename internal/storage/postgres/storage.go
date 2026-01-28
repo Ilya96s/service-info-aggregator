@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/service-info-aggregator/internal/config"
+	"service-info-aggregator/internal/config"
 )
 
 func NewPostgresConnection(cfg *config.PostgresConfig) (*sql.DB, error) {

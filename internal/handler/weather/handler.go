@@ -1,23 +1,23 @@
-package handler
+package weather
 
 import (
 	"encoding/json"
 	"net/http"
 	"time"
 
-	"github.com/service-info-aggregator/internal/repository/cache"
-	"github.com/service-info-aggregator/internal/service"
+	"service-info-aggregator/internal/repository/aggregation_data"
+	"service-info-aggregator/internal/service/aggregation"
 )
 
 type WeatherHandler struct {
-	aggregationService *service.AggregationService
-	weatherProvider    *service.WeatherProvider
-	cache              *cache.RedisRepository
+	aggregationService *aggregation.AggregationService
+	weatherProvider    *aggregation.WeatherProvider
+	cache              *aggregation_data.RedisRepository
 	ttl                time.Duration
 }
 
-func NewWeatherHandler(aggregationService *service.AggregationService, weatherProvider *service.WeatherProvider,
-	repo *cache.RedisRepository, ttl time.Duration) *WeatherHandler {
+func NewWeatherHandler(aggregationService *aggregation.AggregationService, weatherProvider *aggregation.WeatherProvider,
+	repo *aggregation_data.RedisRepository, ttl time.Duration) *WeatherHandler {
 	return &WeatherHandler{
 		aggregationService: aggregationService,
 		weatherProvider:    weatherProvider,

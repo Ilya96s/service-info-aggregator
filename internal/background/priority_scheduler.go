@@ -5,16 +5,17 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/service-info-aggregator/internal/service"
+	"service-info-aggregator/internal/service/aggregation"
+	"service-info-aggregator/internal/service/popular_data"
 )
 
 type PriorityScheduler struct {
-	popularDataService *service.PopularDataService
-	aggregationService *service.AggregationService
+	popularDataService *popular_data.PopularDataService
+	aggregationService *aggregation.AggregationService
 	interval           time.Duration
 }
 
-func NewPriorityScheduler(ps *service.PopularDataService, as *service.AggregationService, interval time.Duration) *PriorityScheduler {
+func NewPriorityScheduler(ps *popular_data.PopularDataService, as *aggregation.AggregationService, interval time.Duration) *PriorityScheduler {
 	return &PriorityScheduler{
 		popularDataService: ps,
 		aggregationService: as,
@@ -49,7 +50,7 @@ func (s *PriorityScheduler) execute(ctx context.Context) {
 	for _, item := range items {
 		switch item.DataType {
 		case "weather":
-			_, err := s.aggregationService.Execute(ctx, &service.WeatherProvider{}, item.Key)
+			_, err := s.aggregationService.Execute(ctx, &aggregation.WeatherProvider{}, item.Key)
 			if err != nil {
 				slog.Error("aggregation failed",
 					"type", item.DataType,

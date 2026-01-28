@@ -8,16 +8,19 @@ import (
 	"os/signal"
 	"time"
 
+	"service-info-aggregator/internal/background"
+	"service-info-aggregator/internal/config"
+	"service-info-aggregator/internal/handler/popular_data"
+	"service-info-aggregator/internal/handler/weather"
+	"service-info-aggregator/internal/messaging/kafka"
+	"service-info-aggregator/internal/repository/aggregation_data"
+	postgresRepo "service-info-aggregator/internal/repository/popular_data"
+	"service-info-aggregator/internal/service/aggregation"
+	popular_data2 "service-info-aggregator/internal/service/popular_data"
+	"service-info-aggregator/internal/storage/postgres"
+
 	_ "github.com/lib/pq"
 	"github.com/redis/go-redis/v9"
-	"github.com/service-info-aggregator/internal/background"
-	"github.com/service-info-aggregator/internal/config"
-	"github.com/service-info-aggregator/internal/handler"
-	"github.com/service-info-aggregator/internal/messaging/kafka"
-	"github.com/service-info-aggregator/internal/repository/cache"
-	postgresRepo "github.com/service-info-aggregator/internal/repository/postgres"
-	"github.com/service-info-aggregator/internal/service"
-	"github.com/service-info-aggregator/internal/storage/postgres"
 )
 
 func main() {
@@ -47,7 +50,7 @@ func main() {
 		slog.Error("failed to connect to redis", "error", err)
 		return
 	}
-	repo := cache.NewRedisRepository(rdb)
+	repo := aggregation_data.NewRedisRepository(rdb)
 
 	// --- Kafka Producer ---
 	producer, err := kafka.NewKafkaProducer(
@@ -64,19 +67,19 @@ func main() {
 	popularDataRepository := postgresRepo.NewPopularDataRepository(db)
 
 	// --- Popular Data Service
-	popularDataService := service.NewPopularDataService(popularDataRepository)
+	popularDataService := popular_data2.NewPopularDataService(popularDataRepository)
 
 	// --- Сервис агрегирования ---
-	aggService := service.NewAggregationService(producer, kafkaCfg.Topic)
+	aggService := aggregation.NewAggregationService(producer, kafkaCfg.Topic)
 
 	// --- Popular Data Handler ---
-	popularDataHandler := handler.NewPopularDataHandler(popularDataService)
+	popularDataHandler := popular_data.NewPopularDataHandler(popularDataService)
 
 	// --- Weather Provider ---
-	weatherProvider := &service.WeatherProvider{}
+	weatherProvider := &aggregation.WeatherProvider{}
 
 	// --- Weather Handler (HTTP) ---
-	weatherHandler := handler.NewWeatherHandler(aggService, weatherProvider, repo, redisCfg.WeatherTTL)
+	weatherHandler := weather.NewWeatherHandler(aggService, weatherProvider, repo, redisCfg.WeatherTTL)
 
 	mux := http.NewServeMux()
 

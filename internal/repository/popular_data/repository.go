@@ -1,4 +1,4 @@
-package postgres
+package popular_data
 
 import (
 	"context"
@@ -6,8 +6,16 @@ import (
 	"errors"
 	"time"
 
-	"github.com/service-info-aggregator/internal/model/dto"
+	"service-info-aggregator/internal/model/dto"
 )
+
+type Repository interface {
+	Create(ctx context.Context, dto *dto.PopularDataDto) (*dto.PopularDataDto, error)
+	GetAll(ctx context.Context) ([]dto.PopularDataDto, error)
+	GetById(ctx context.Context, id int) (*dto.PopularDataDto, error)
+	Update(ctx context.Context, id int, dto *dto.PopularDataDto) (*dto.PopularDataDto, error)
+	Delete(ctx context.Context, id int) error
+}
 
 type PopularDataRepository struct {
 	db *sql.DB

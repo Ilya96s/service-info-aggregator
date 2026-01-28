@@ -1,17 +1,17 @@
-package service
+package popular_data
 
 import (
 	"context"
 
-	"github.com/service-info-aggregator/internal/model/dto"
-	"github.com/service-info-aggregator/internal/repository/postgres"
+	"service-info-aggregator/internal/model/dto"
+	"service-info-aggregator/internal/repository/popular_data"
 )
 
 type PopularDataService struct {
-	Repo *postgres.PopularDataRepository
+	Repo popular_data.Repository
 }
 
-func NewPopularDataService(repo *postgres.PopularDataRepository) *PopularDataService {
+func NewPopularDataService(repo popular_data.Repository) *PopularDataService {
 	return &PopularDataService{
 		Repo: repo,
 	}

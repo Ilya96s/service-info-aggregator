@@ -1,4 +1,4 @@
-package service
+package aggregation
 
 import (
 	"context"
@@ -6,8 +6,8 @@ import (
 	"log/slog"
 	"time"
 
-	"github.com/service-info-aggregator/internal/messaging/kafka"
-	"github.com/service-info-aggregator/internal/model/events"
+	"service-info-aggregator/internal/messaging/kafka"
+	"service-info-aggregator/internal/model/events"
 )
 
 type AggregationService struct {
